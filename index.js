@@ -125,7 +125,7 @@ app.listen(PORT, () => {
   console.log(`PERSON Server running on port ${PORT}`)
 })
 
-
+app.use(express.static('dist'))
 
 /* Morgan: 
 
