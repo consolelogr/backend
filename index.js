@@ -3,6 +3,7 @@ const app = express()
 const morgan =require('morgan')
 
 app.use(express.json())
+app.use(express.static('dist'))
 
 morgan.token('body', (request) => {
   return request.method === 'POST' ? JSON.stringify(request.body) : '';
@@ -125,7 +126,7 @@ app.listen(PORT, () => {
   console.log(`PERSON Server running on port ${PORT}`)
 })
 
-app.use(express.static('dist'))
+
 
 /* Morgan: 
 
