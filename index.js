@@ -99,9 +99,9 @@ app.get('/api/persons', (request, response) => {
   app.delete('/api/persons/:id', (request, response) => {
     
     const id = request.params.id
-    person = persons.filter(person => person.id !== id)
+    persons = persons.filter(person => person.id !== id)
   
-    response.status("error jotain")
+    response.status(204).end();
   })
 
 app.get('/api/persons/:id', (request, response) => {
