@@ -2,10 +2,14 @@ const express = require('express')
 const app = express()
 const morgan =require('morgan')
 const cors = require('cors')
+const connectDB = require('./models/mongo'); 
+
 
 app.use(cors())
 app.use(express.json())
 app.use(express.static('dist'))
+connectDB(); // Connect to MongoDB
+
 
 morgan.token('body', (request) => {
   return request.method === 'POST' ? JSON.stringify(request.body) : '';
