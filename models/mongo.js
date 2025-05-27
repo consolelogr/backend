@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
-
+mongoose.set('strictQuery',false)
+const url = process.env.MONGODB_URI
 
 const connectDB =() => {
 if (process.argv.length < 3) {
@@ -9,38 +10,63 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 
-
-const url = `mongodb+srv://koekaniini:${password}@fso.i5cuyfc.mongodb.net/phonebook?retryWrites=true&w=majority&appName=FSO`
-
-
-mongoose.set('strictQuery',false)
-
-mongoose.connect(url)
+/*mongoose.connect(url)
 
 const personSchema = new mongoose.Schema({
-  content: String,
-    number: String,
+  name: String,
+  number: String,
+  important: Boolean,
+})   */
+
+
+mongoose.connect(url)
+  .then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch(error => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
+
+  const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
   important: Boolean,
 })
 
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+
+
 const Person = mongoose.model('Person', personSchema, 'persons')
 
+/*
 const person = new Person({
   content: 'HTML is easy',
   number: '123456789',
   important: true,
 })
+*/
 
-/*
+const person = new Person({
+  name: process.argv[3],
+  number: process.argv[4],
+});
+
 person.save().then(result => {
   console.log('person saved!')
-  mongoose.connection.close()
+  //mongoose.connection.close()
 })
-*/
 
 Person.find({}).then(result => {
   result.forEach(person => {
-    console.log(person)
+    console.log(`\nPhonebook: \n${person.name} \n${person.number}`);
+
   })
   mongoose.connection.close()
 })

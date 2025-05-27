@@ -1,130 +1,130 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const morgan =require('morgan')
 const cors = require('cors')
-const connectDB = require('./models/mongo'); 
-
-
-app.use(cors())
-app.use(express.json())
-app.use(express.static('dist'))
-connectDB(); // Connect to MongoDB
-
+const Person = require('./models/person'); // Import the Person model
 
 morgan.token('body', (request) => {
   return request.method === 'POST' ? JSON.stringify(request.body) : '';
 });
-
 app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
-
-
-
-let persons =[
-  { 
-    "id": "1",
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": "2",
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": "3",
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": "4",
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
+app.use(cors())
+app.use(express.json())
+app.use(express.static('dist'))  //for front-end build
 
 const kello = new Date()
-
-const generateId = () => {
-  
-  const newId = Math.floor(Math.random()*123456789)
-   //Tee jotain tarkistuksia
+/*const generateId = () => {
+const newId = Math.floor(Math.random()*123456789)
   console.log('Generated Id:' + newId)
   return(newId)
-  
-}
+  //mongodb creates ID not needed here for now
+  }*/
 
 
-
-
-
+//render.com 
 app.get('/', (request, response) => {
-  
+  console.log('GET / index.js')
   response.send('<h1>It is a fine day today!</h1>') 
- })
+})
 
+app.get('/info', async (request, response, next) => {
+  try {
+    const count = await Person.countDocuments({});
+    response.send(`There are ${count} persons in the phonebook<br><br>Time: ${new Date()}`);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/*
  app.get('/info', (request, response) => {
 	response.send  
-  ('There are ' + persons.length + ' persons in the phonebook' + '<br>' + '<br>' + 'Time: ' + kello.getHours() + ':' + kello.getMinutes() + ':' + kello.getSeconds() + ':' + kello.getMilliseconds() + '<br>' + 'Timezone: ' +  (kello.getTimezoneOffset()/60) + ' GMT' + '<br>' + 'Date: ' + kello.getDate() + '/' + (kello.getMonth() + 1) + '/' + kello.getFullYear() 
+  ('There are ' + Person.length + ' persons in the phonebook' + '<br>' + '<br>' + 'Time: ' + kello.getHours() + ':' + kello.getMinutes() + ':' + kello.getSeconds() + ':' + kello.getMilliseconds() + '<br>' + 'Timezone: ' +  (kello.getTimezoneOffset()/60) + ' GMT' + '<br>' + 'Date: ' + kello.getDate() + '/' + (kello.getMonth() + 1) + '/' + kello.getFullYear() 
      ) 
  })
+*/
 
 
- app.post('/api/persons', (request, response) => {
-  const person = request.body;
+//Toimiva testi setti:
+// Create new person using the Mongoose model
+const person = new Person({
+  name: '2705 Test index.js',
+  number: '888888'
+});
 
-  if (!person.name || !person.number) {
+// Save to MongoDB
+person.save()
+  .then(savedPerson => {
+    console.log('Person saved:', savedPerson);
+    // You can also send a response here if needed
+  })
+  .catch(error => {
+    console.error('Error saving person:', error);
+    });
+
+
+
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body;
+
+  if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  const nameExists = persons.find(p => p.name === person.name);
+  const nameExists = Person.find(p => p.name === body.name);
   if (nameExists) {
     return response.status(400).json({ error: 'name must be unique' });
   }
 
-  const newPerson = {
-    id: generateId().toString(), 
-    name: person.name,
-    number: person.number
-  };
+  const newPerson = new Person({
+    //id: generateId().toString(), 
+    name: body.name,
+    number: body.number
+  });
 
-  persons = persons.concat(newPerson);
+  Person = Person.concat(newPerson);
   response.status(201).json(newPerson); 
 });
 
-
 app.get('/api/persons', (request, response) => {
   generateId();
-  response.json(persons)
+  response.json(Person)
   })
 
-  app.delete('/api/persons/:id', (request, response) => {
-    
+app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
-  
+    Person = Person.filter(person => person.id !== id)
     response.status(204).end();
   })
 
 app.get('/api/persons/:id', (request, response) => {
 	const id = request.params.id
-	const person = persons.find(person => person.id === id)
+	const person = Person.find(person => person.id === id)
   if (person) {
 	  response.json(person)
 	} else {
       response.status(404).send('<h1>404 Not Found</h1><p>The resource you are looking for does not exist.</p>');
-    
-    
 	}
   })  
+
+// Fetch all persons
+async function getAllPersons() {
+  const persons = await Person.find({});
+  console.log('📦 Persons in DB:');
+  persons.forEach(p => console.log(`${p.name}: ${p.number}`));
+}
+
  
-  const unknownEndpoint = (request, response) => {
+const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
   }
   
-  app.use(unknownEndpoint)
+app.use(unknownEndpoint)
 
   
 const PORT = process.env.PORT ||3001

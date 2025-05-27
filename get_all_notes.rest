@@ -8,6 +8,6 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-  "name": "qweqwe",
+  "name": "get all notes .rest addition",
   "number": "4353454"
 }
