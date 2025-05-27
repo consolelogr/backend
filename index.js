@@ -70,14 +70,12 @@ person.save()
 //zibidi 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body;
-    console.log('POST /api/persons called with:', request.body);
-
 
   if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  // Check if name already exists in the database
+  // Optional: Check if name already exists in DB (requires an async query)
   Person.findOne({ name: body.name })
     .then(existingPerson => {
       if (existingPerson) {
@@ -89,14 +87,16 @@ app.post('/api/persons', (request, response, next) => {
         number: body.number
       });
 
-      newPerson.save()
-        .then(savedPerson => {
-          response.status(201).json(savedPerson);
-        })
-        .catch(error => next(error));
+      return newPerson.save();
+    })
+    .then(savedPerson => {
+      if (savedPerson) {
+        response.status(201).json(savedPerson);
+      }
     })
     .catch(error => next(error));
 });
+
 // zibidi end
 
 app.get('/api/persons', (request, response) => {
