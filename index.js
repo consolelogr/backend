@@ -68,33 +68,29 @@ person.save()
 
 
 //zibidi 
-app.post('/api/persons', (request, response, next) => {
+app.post('/api/persons', (request, response) => {
   const body = request.body;
+
+  console.log('💥 Received POST /api/persons with data:', body);  // <== ADD THIS
 
   if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  // Optional: Check if name already exists in DB (requires an async query)
-  Person.findOne({ name: body.name })
-    .then(existingPerson => {
-      if (existingPerson) {
-        return response.status(400).json({ error: 'name must be unique' });
-      }
+  const newPerson = new Person({
+    name: body.name,
+    number: body.number
+  });
 
-      const newPerson = new Person({
-        name: body.name,
-        number: body.number
-      });
-
-      return newPerson.save();
-    })
+  newPerson.save()
     .then(savedPerson => {
-      if (savedPerson) {
-        response.status(201).json(savedPerson);
-      }
+      console.log('✅ Saved to MongoDB:', savedPerson);  // <== ADD THIS TOO
+      response.status(201).json(savedPerson);
     })
-    .catch(error => next(error));
+    .catch(error => {
+      console.error('❌ Error saving person:', error);
+      response.status(500).json({ error: 'Internal server error' });
+    });
 });
 
 // zibidi end
