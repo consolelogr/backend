@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "gitpush": "git add . && git commit -m \"quick commit\" && git push"
   },
   "author": "Teemu Vesterinen",
   "license": "ISC",
