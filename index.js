@@ -70,6 +70,8 @@ person.save()
 //zibidi 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body;
+    console.log('POST /api/persons called with:', request.body);
+
 
   if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
