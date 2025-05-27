@@ -67,29 +67,35 @@ person.save()
     });
 
 
-
-
-app.post('/api/persons', (request, response) => {
+//zibidi 
+app.post('/api/persons', (request, response, next) => {
   const body = request.body;
 
   if (!body.name || !body.number) {
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
-  const nameExists = Person.find(p => p.name === body.name);
-  if (nameExists) {
-    return response.status(400).json({ error: 'name must be unique' });
-  }
+  // Check if name already exists in the database
+  Person.findOne({ name: body.name })
+    .then(existingPerson => {
+      if (existingPerson) {
+        return response.status(400).json({ error: 'name must be unique' });
+      }
 
-  const newPerson = new Person({
-    //id: generateId().toString(), 
-    name: body.name,
-    number: body.number
-  });
+      const newPerson = new Person({
+        name: body.name,
+        number: body.number
+      });
 
-  Person = Person.concat(newPerson);
-  response.status(201).json(newPerson); 
+      newPerson.save()
+        .then(savedPerson => {
+          response.status(201).json(savedPerson);
+        })
+        .catch(error => next(error));
+    })
+    .catch(error => next(error));
 });
+// zibidi end
 
 app.get('/api/persons', (request, response) => {
   generateId();
