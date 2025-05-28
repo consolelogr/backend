@@ -39,4 +39,5 @@ async function addNewPerson() {
   console.log(`➕ Added ${newPerson.name} to MongoDB`);
 }
 
-module.exports = mongoose.model('Person', personSchema)
+module.exports = mongoose.model('Person', personSchema, 'persons');
+
