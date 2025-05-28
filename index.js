@@ -56,6 +56,13 @@ const person = new Person({
   number: '888888'
 });
 
+//zibidi testi
+const testPerson = new Person({ name: 'RenderTest', number: '999999' });
+testPerson.save()
+  .then(saved => console.log('🌱 Direct save worked:', saved))
+  .catch(err => console.error('❌ Direct save failed:', err.message));
+
+
 // Save to MongoDB
 person.save()
   .then(savedPerson => {
