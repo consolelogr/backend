@@ -52,7 +52,7 @@ app.get('/info', async (request, response, next) => {
 //Toimiva testi setti:
 // Create new person using the Mongoose model
 const person = new Person({
-  name: '2705 Test index.js',
+  name: '2905 14-> Test index.js',
   number: '888888'
 });
 
