@@ -61,7 +61,14 @@ const person = new Person({
   name: 'Test User',
   number: '2905 12345'
 });
-await person.save();
+
+person.save()
+  .then(savedPerson => {
+    console.log('Person saved:', savedPerson);
+  })
+  .catch(error => {
+    console.error('Error saving person:', error);
+  });
 
 // Save to MongoDB
 person.save()
