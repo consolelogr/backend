@@ -49,13 +49,6 @@ app.get('/info', async (request, response, next) => {
 */
 
 
-//Toimiva testi setti:
-// Create new person using the Mongoose model
-const person = new Person({
-  name: '2905 14-> Test index.js',
-  number: '888888'
-});
-
 //zibidi testi
 const testPerson = new Person({ name: 'RenderTest', number: '999999' });
 testPerson.save()
@@ -64,7 +57,7 @@ testPerson.save()
 
 
 // Save to MongoDB
-person.save()
+Person.save()
   .then(savedPerson => {
     console.log('Person saved:', savedPerson);
     // You can also send a response here if needed
