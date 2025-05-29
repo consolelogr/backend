@@ -103,17 +103,29 @@ app.post('/api/persons', (request, response) => {
 
 // zibidi end
 
+/*
 app.get('/api/persons', (request, response) => {
   generateId();
   response.json(Person)
   })
+*/
+app.get('/api/persons', async (request, response, next) => {
+  try {
+    const persons = await Person.find({});
+    response.json(persons);
+  } catch (error) {
+    next(error);
+  }
+});
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    Person = Person.filter(person => person.id !== id)
+app.delete('/api/persons/:id', async (request, response, next) => {
+  try {
+    await Person.findByIdAndDelete(request.params.id);
     response.status(204).end();
-  })
-
+  } catch (error) {
+    next(error);
+  }
+});
 app.get('/api/persons/:id', (request, response) => {
 	const id = request.params.id
 	const person = Person.find(person => person.id === id)
