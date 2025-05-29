@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "gitpush": "echo $(date) && git add . && git commit -m \"quick commit\" && git push",
+    "gitpush": "git add . && git commit -m \"quick commit\" && git push",
 "build": "rm -rf dist && cd ../phonebook_backend/ && npm run build && cp -r dist ../backend"
   },
   "author": "Teemu Vesterinen",
