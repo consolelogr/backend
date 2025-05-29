@@ -56,8 +56,15 @@ testPerson.save()
   .catch(err => console.error('❌ Direct save failed:', err.message));
 
 
+
+const person = new Person({
+  name: 'Test User',
+  number: '2905 12345'
+});
+await person.save();
+
 // Save to MongoDB
-Person.save()
+person.save()
   .then(savedPerson => {
     console.log('Person saved:', savedPerson);
     // You can also send a response here if needed
