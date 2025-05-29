@@ -1,5 +1,6 @@
 {
   "name": "backend",
+  "type": "commonjs",
   "version": "1.0.0",
   "description": "Phonebook backend copy for render.com - FSO",
   "main": "index.js",
