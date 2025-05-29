@@ -77,10 +77,10 @@ person.save()
 //zibidi 
 app.post('/api/persons', (request, response) => {
   const body = request.body;
-
-  console.log('💥 Received POST /api/persons with data:', body);  // <== ADD THIS
+  console.log('💥 Received POST /api/persons with data:', body);
 
   if (!body.name || !body.number) {
+    console.warn('⚠ Missing name or number');
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
@@ -91,14 +91,15 @@ app.post('/api/persons', (request, response) => {
 
   newPerson.save()
     .then(savedPerson => {
-      console.log('✅ Saved to MongoDB:', savedPerson);  // <== ADD THIS TOO
+      console.log('✅ Saved to MongoDB:', savedPerson);
       response.status(201).json(savedPerson);
     })
     .catch(error => {
       console.error('❌ Error saving person:', error);
-      response.status(500).json({ error: 'Internal server error' });
+      response.status(500).json({ error: error.message });  // send back detailed error
     });
 });
+
 
 // zibidi end
 
