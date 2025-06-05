@@ -7,6 +7,7 @@ const url = process.env.MONGODB_URI
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
+  minLenght: 3,
   important: Boolean,
 })
 
@@ -36,7 +37,7 @@ async function addNewPerson() {
   });
 
   await newPerson.save();
-  console.log(`➕ Added ${newPerson.name} to MongoDB`);
+  console.log(`Added ${newPerson.name} to MongoDB`);
 }
 
 module.exports = mongoose.model('Person', personSchema, 'persons');
