@@ -61,22 +61,15 @@ app.get('/info', async (request, response, next) => {
  })
 */
 
-
-/* zibidi testi
-const testPerson = new Person({ name: 'RenderTest', number: '999999' });
-testPerson.save()
-  .then(saved => console.log('🌱 Direct save worked:', saved))
-  .catch(err => console.error('❌ Direct save failed:', err.message));
-
-*/
+/*
 
 const person = new Person({
   name: '',
   number: ''
 });
+*/
 
-
-
+/*
 // Save to MongoDB
 person.save()
   .then(savedPerson => {
@@ -86,7 +79,7 @@ person.save()
     console.error('Error saving person:', error);
     });
 
-
+*/
 
 app.post('/api/persons', (request, response) => {
   const body = request.body;
