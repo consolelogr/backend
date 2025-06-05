@@ -8,13 +8,10 @@ const Person = require('./models/person'); // Import the Person model
 morgan.token('body', (request) => {
   return request.method === 'POST' ? JSON.stringify(request.body) : '';
 });
-app.use(
-  morgan(':method :url :status :res[content-length] - :response-time ms :body')
-);
-
-app.use(cors())
-app.use(express.json())
 app.use(express.static('dist'))  //for front-end build
+app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body') );
+app.use(cors())
 
 const kello = new Date()
 /*const generateId = () => {
@@ -23,6 +20,22 @@ const newId = Math.floor(Math.random()*123456789)
   return(newId)
   //mongodb creates ID not needed here for now
   }*/
+
+  const errorHandler = (error, request, response, next) => {
+  console.error("const errorHandler", error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+  else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
+  }app.
+
+  next(error)
+}
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler)
 
 
 //render.com 
@@ -49,45 +62,38 @@ app.get('/info', async (request, response, next) => {
 */
 
 
-//zibidi testi
+/* zibidi testi
 const testPerson = new Person({ name: 'RenderTest', number: '999999' });
 testPerson.save()
   .then(saved => console.log('🌱 Direct save worked:', saved))
   .catch(err => console.error('❌ Direct save failed:', err.message));
 
-
+*/
 
 const person = new Person({
-  name: 'Test User',
-  number: '2905 12345'
+  name: '',
+  number: ''
 });
 
-person.save()
-  .then(savedPerson => {
-    console.log('Person saved:', savedPerson);
-  })
-  .catch(error => {
-    console.error('Error saving person:', error);
-  });
+
 
 // Save to MongoDB
 person.save()
   .then(savedPerson => {
     console.log('Person saved:', savedPerson);
-    // You can also send a response here if needed
   })
   .catch(error => {
     console.error('Error saving person:', error);
     });
 
 
-//zibidi 
+
 app.post('/api/persons', (request, response) => {
   const body = request.body;
-  console.log('💥 Received POST /api/persons with data:', body);
+  console.log('Received POST /api/persons with data:', body);
 
   if (!body.name || !body.number) {
-    console.warn('⚠ Missing name or number');
+    console.warn('Missing name or number');
     return response.status(400).json({ error: 'name or number is missing' });
   }
 
@@ -98,17 +104,43 @@ app.post('/api/persons', (request, response) => {
 
   newPerson.save()
     .then(savedPerson => {
-      console.log('✅ Saved to MongoDB:', savedPerson);
+      console.log('Saved to MongoDB:', savedPerson);
       response.status(201).json(savedPerson);
     })
     .catch(error => {
-      console.error('❌ Error saving person:', error);
+      console.error('Error saving person:', error);
       response.status(500).json({ error: error.message });  // send back detailed error
     });
 });
 
 
-// zibidi end
+app.put('/api/persons/:id', async (request, response, next) => {
+  const { name, number } = request.body;
+
+  if (!name || !number) {
+    return response.status(400).json({ error: 'name or number is missing' });
+  }
+
+  try {
+    const updatedPerson = await Person.findByIdAndUpdate(
+      request.params.id,
+      { name, number },
+      { new: true, runValidators: true, context: 'query' }
+    );
+
+    if (!updatedPerson) {
+      return response.status(404).json({ error: 'person not found' });
+    }
+
+    response.json(updatedPerson);
+  } catch (error) {
+    next(error);
+  }
+});
+// Test route to check if the server is running
+
+
+
 
 /*
 app.get('/api/persons', (request, response) => {
@@ -133,15 +165,19 @@ app.delete('/api/persons/:id', async (request, response, next) => {
     next(error);
   }
 });
-app.get('/api/persons/:id', (request, response) => {
-	const id = request.params.id
-	const person = Person.find(person => person.id === id)
-  if (person) {
-	  response.json(person)
-	} else {
-      response.status(404).send('<h1>404 Not Found</h1><p>The resource you are looking for does not exist.</p>');
-	}
-  })  
+
+app.get('/api/persons/:id', async (request, response, next) => {
+  try {
+    const person = await Person.findById(request.params.id);
+    if (person) {
+      response.json(person);
+    } else {
+      response.status(404).json({ error: 'person not found' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});  
 
 // Fetch all persons
 async function getAllPersons() {
@@ -152,7 +188,7 @@ async function getAllPersons() {
 
  
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
+    response.status(404).send({ error: 'unknown endpoint no niin' })
   }
   
 app.use(unknownEndpoint)
